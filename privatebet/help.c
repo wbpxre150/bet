@@ -4,36 +4,40 @@
 
 void bet_command_info()
 {
-	dlg_info(
-		"\n==Dealer==\n"
-		"dcv \"ipv4 address of the dealer node\" \n"
-		"\n==Player==\n"
-		"player \n"
-		"\n==Cashier==\n"
-		"cashierd cashier \"ipv4 address of the cashier node\" \n"
-		"\n==DRP==\n"
-		"game info [fail]/[success] \n"
-		"game solve \n"
-		"game dispute \" Disputed tx to resolve\" \n"
-		"\n==Wallet==\n"
-		"withdraw amount \"chips address\" \n"
-		"withdraw all \"chips address\" \n"
-		"spendable \n"
-		"consolidate \n"
-		"tx_split m n #Where m is splitted into n parts\n"
-		"extract_tx_data tx_id \n"
-		"\n==Blockchain scanner for Explorer==\n"
-		"scan \n"
-		"\n==VDXF ID Commands==\n"
-		"print_id <id_name> <type>\n"
-		"print <id_name> <key_name>\n"
-		"add_dealer <dealer_id> \n"
-		"list_dealers \n"
-		"list_tables \n"
-		"reset_id \n"
-		"\nTo get more info about a specific command try ./bet help command \n"
-		"\n==HELP==\n"
-		"help <command_name, commands supported: cashier/dealer/player/game/spendable/scan/withdraw/verus/vdxf> \n");
+	const char *help_text = "\nAvailable Commands:\n"
+				"\n==Dealer==\n"
+				"dcv <ipv4_address>     Start the dealer node\n"
+				"\n==Player==\n"
+				"player                 Start the player node\n"
+				"\n==Cashier==\n"
+				"cashierd cashier <ipv4_address>  Start the cashier node\n"
+				"\n==DRP (Dispute Resolution Protocol)==\n"
+				"game info <fail|success>         Display game information\n"
+				"game solve                       Resolve all disputes\n"
+				"game dispute <tx_id>             Resolve specific dispute\n"
+				"\n==Wallet==\n"
+				"withdraw <amount> <chips_address>  Withdraw specific amount\n"
+				"withdraw all <chips_address>       Withdraw all funds\n"
+				"spendable                          List spendable transactions\n"
+				"consolidate                        Consolidate funds\n"
+				"tx_split <m> <n>                   Split transaction (m into n parts)\n"
+				"extract_tx_data <tx_id>            Extract transaction data\n"
+				"\n==Blockchain Scanner==\n"
+				"scan                               Scan blockchain for game info\n"
+				"\n==VDXF ID Commands==\n"
+				"print_id <id_name> <type>          Print ID information\n"
+				"print <id_name> <key_name>         Print specific key information\n"
+				"add_dealer <dealer_id>             Add a dealer\n"
+				"list_dealers                       List all dealers\n"
+				"list_tables                        List all tables\n"
+				"reset_id                           Reset ID information\n"
+				"\n==Help==\n"
+				"help <command>         Get detailed help for a command\n"
+				"                       Supported commands: cashier, dealer, player, game,\n"
+				"                       spendable, scan, withdraw, verus, vdxf\n"
+				"\nFor more information about a specific command, use: ./bet help <command>\n";
+
+	dlg_info("%s", help_text);
 }
 
 void bet_help_dcv_command_usage()
@@ -244,42 +248,97 @@ void bet_help_vdxf_command_usage()
 		"./bet reset_id <id_name>\n");
 }
 
+void bet_help_print_command_usage(void)
+{
+	dlg_info(
+		"\nCommand: \n"
+		"print \n"
+		"\nDescription: \n"
+		"Print information about a specific ID and key\n"
+		"\nUsage: \n"
+		"./bet print <id> <key>\n"
+		"\nArguments: \n"
+		"<id>: The ID to query\n"
+		"<key>: The key to retrieve information for\n"
+		"\nExample: \n"
+		"./bet print myid table_info\n"
+		"\nNote: \n"
+		"This command supports printing information for various keys such as table_info, player_info, dealers, game_id, and game_info.\n"
+		"The output format depends on the key type.\n");
+}
+
+void bet_help_print_id_command_usage()
+{
+	dlg_info("\nCommand: \n"
+		 "print_id \n"
+		 "\nDescription: \n"
+		 "Print information about a specific ID and its type\n"
+		 "\nUsage: \n"
+		 "./bet print_id <id_name> <type>\n"
+		 "\nArguments: \n"
+		 "<id_name>: The name of the ID to query\n"
+		 "<type>: The type of ID information to retrieve (e.g., 'dealers', 'table', 'dealer', etc.)\n"
+		 "\nExample: \n"
+		 "./bet print_id myid table\n");
+}
+void bet_help_reset_id_command_usage(void)
+{
+	dlg_info(
+		"\nCommand: \n"
+		"reset_id \n"
+		"\nDescription: \n"
+		"Reset the contentmultimap (CMM) of an ID to NULL. This command requires authority over the ID to execute.\n"
+		"\nUsage: \n"
+		"./bet reset_id <id_name>\n"
+		"\nArguments: \n"
+		"<id_name>: The name of the ID whose CMM you want to reset\n"
+		"\nResult: \n"
+		"The latest CMM of the specified ID is set to NULL\n"
+		"\nExample: \n"
+		"./bet reset_id myid\n"
+		"\nNote: \n"
+		"This command should be used with caution as it resets all the information associated with the ID.\n"
+		"Ensure you have the necessary permissions before executing this command.\n");
+}
+
 // clang-format off
 void bet_help_command(char *command)
 {
-	switchs(command) {
-		cases("cashier")
-		cases("cashierd")
-			bet_help_cashier_command_usage();
-			break;
-		cases("dcv")
-		cases("dealer")
-			bet_help_dcv_command_usage();
-			break;
-		cases("extract_tx_data")
-			bet_help_extract_tx_data_command_usage();
-			break;
-		cases("game")
-			bet_help_game_command_usage();
-			break;
-		cases("player")
-			bet_help_player_command_usage();
-			break;
-		cases("spendable")
-			bet_help_spendable_command_usage();
-			break;
-		cases("scan")
-			bet_help_scan_command_usage();
-			break;
-		cases("withdraw")
-			bet_help_withdraw_command_usage();
-			break;
-		cases("vdxf")
-		cases("verus")
-			bet_help_vdxf_command_usage();
-			break;
-		defaults
-			dlg_info("The command %s is not yet supported by bet", command);
-	}switchs_end;
+    if (!command) {
+        dlg_error("Invalid command: NULL");
+        return;
+    }
+
+    typedef struct {
+        const char *cmd;
+        void (*help_func)(void);
+    } CommandHelp;
+
+    const CommandHelp command_helps[] = {
+        {"cashier", bet_help_cashier_command_usage},
+        {"cashierd", bet_help_cashier_command_usage},
+        {"dcv", bet_help_dcv_command_usage},
+        {"dealer", bet_help_dcv_command_usage},
+        {"extract_tx_data", bet_help_extract_tx_data_command_usage},
+        {"game", bet_help_game_command_usage},
+        {"player", bet_help_player_command_usage},
+        {"spendable", bet_help_spendable_command_usage},
+        {"scan", bet_help_scan_command_usage},
+        {"withdraw", bet_help_withdraw_command_usage},
+        {"vdxf", bet_help_vdxf_command_usage},
+        {"verus", bet_help_vdxf_command_usage},
+        {"print", bet_help_print_command_usage},
+		{"print_id", bet_help_print_id_command_usage},
+        {"reset_id", bet_help_reset_id_command_usage},
+        {NULL, NULL}  // Sentinel to mark the end of the array
+    };
+
+    for (const CommandHelp *ch = command_helps; ch->cmd != NULL; ch++) {
+        if (strcmp(command, ch->cmd) == 0) {
+            ch->help_func();
+            return;
+        }
+    }
+
+    dlg_info("The command %s is not yet supported by bet", command);
 }
-// clang-format on
