@@ -195,7 +195,7 @@ void bet_help_vdxf_command_usage()
 		"Display of parsed key information of an ID \n"
 		"\nExample: \n"
 		"./bet print <id_name> <key_name>\n"
-		"Note: Here id_name can be any ID under the namespace poker.chips10sec@, supported key names are dealers/t_game_ids/t_game_ids/t_player_info\n");
+		"Note: Here id_name can be any ID under the namespace poker.chips@, supported key names are dealers/t_game_ids/t_game_ids/t_player_info\n");
 
 	dlg_info(
 		"\nCommand: \n"
@@ -206,13 +206,13 @@ void bet_help_vdxf_command_usage()
 		"Display the contentmultimap of the given ID \n"
 		"\nExample: \n"
 		"./bet print_id <id_name> <id_type>\n"
-		"Note: Here id_name can be any ID under the namespace poker.chips10sec@, supported ID types are table/dealer/dealers\n");
+		"Note: Here id_name can be any ID under the namespace poker.chips@, supported ID types are table/dealer/dealers\n");
 
 	dlg_info(
 		"\nCommand: \n"
 		"add_dealer \n"
 		"\nDescription: \n"
-		"Registers the dealer ID, for this command to run one need to have authrotity to update the ID dealers.poker.chips10sec@ ID\n"
+		"Registers the dealer ID, for this command to run one need to have authrotity to update the ID dealers.poker.chips@ ID\n"
 		"\nResult: \n"
 		"A dealer ID is added to the dealers \n"
 		"\nExample: \n"
@@ -222,7 +222,7 @@ void bet_help_vdxf_command_usage()
 	dlg_info("\nCommand: \n"
 		 "list_dealers \n"
 		 "\nDescription: \n"
-		 "Lists all the dealers that are attached to the dealers key in dealers.poker.chips10sec@ ID\n"
+		 "Lists all the dealers that are attached to the dealers key in dealers.poker.chips@ ID\n"
 		 "\nResult: \n"
 		 "List of available dealer names \n"
 		 "\nExample: \n"

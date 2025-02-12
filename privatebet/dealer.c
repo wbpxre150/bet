@@ -274,7 +274,7 @@ int32_t dealer_init(struct table t)
 	}
 
 	if (!is_dealer_registered(t.dealer_id)) {
-		// TODO:: An automated mechanism to register the dealer with dealers.poker.chips10sec need to be worked out
+		// TODO:: An automated mechanism to register the dealer with dealers.poker.chips need to be worked out
 		return ERR_DEALER_UNREGISTERED;
 	}
 

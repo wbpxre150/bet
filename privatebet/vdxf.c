@@ -176,7 +176,7 @@ cJSON *get_cmm(char *id, int16_t full_id)
 
 	strncpy(params, id, strlen(id));
 	if (0 == full_id) {
-		strcat(params, ".poker.chips10sec@");
+		strcat(params, ".poker.chips@");
 	}
 	argc = 4;
 	bet_alloc_args(argc, &argv);
@@ -240,7 +240,7 @@ cJSON *get_primaryaddresses(char *id, int16_t full_id)
 	}
 	strncpy(params, id, strlen(id));
 	if (0 == full_id) {
-		strcat(params, ".poker.chips10sec@");
+		strcat(params, ".poker.chips@");
 	}
 	argc = 4;
 	bet_alloc_args(argc, &argv);
@@ -557,7 +557,7 @@ bool is_id_exists(char *id, int16_t full_id)
 
 	strncpy(params, id, strlen(id));
 	if (0 == full_id) {
-		strcat(params, ".poker.chips10sec@");
+		strcat(params, ".poker.chips@");
 	}
 	argc = 4;
 	bet_alloc_args(argc, &argv);
@@ -1269,7 +1269,7 @@ void process_block(char *blockhash)
 	}
 
 	/*
-	* List all the utxos attached to the registered cashiers, like cashiers.poker.chips10sec@
+	* List all the utxos attached to the registered cashiers, like cashiers.poker.chips@
 	* Look for the utxos that matches to the current processing block height
 	* Extract the tx data 
 	* Process the tx data to see if this tx is intended and related to poker
@@ -1303,7 +1303,7 @@ cJSON *list_dealers()
 	dealers = get_cJSON_from_id_key(DEALERS_ID_FQN, DEALERS_KEY, 1);
 
 	if (!dealers) {
-		dlg_info("No dealers has been added to dealers.poker.chips10sec@ yet.");
+		dlg_info("No dealers has been added to dealers.poker.chips@ yet.");
 		return NULL;
 	}
 	dealers_arr = cJSON_GetObjectItem(dealers, "dealers");
@@ -1405,7 +1405,7 @@ int32_t id_canspendfor(char *id, int32_t full_id, int32_t *err_no)
 
 	strncpy(params, id, strlen(id));
 	if (0 == full_id) {
-		strcat(params, ".poker.chips10sec@");
+		strcat(params, ".poker.chips@");
 	}
 	argc = 4;
 	bet_alloc_args(argc, &argv);
@@ -1444,7 +1444,7 @@ int32_t id_cansignfor(char *id, int32_t full_id, int32_t *err_no)
 
 	strncpy(params, id, strlen(id));
 	if (0 == full_id) {
-		strcat(params, ".poker.chips10sec@");
+		strcat(params, ".poker.chips@");
 	}
 	bet_alloc_args(argc, &argv);
 	argv = bet_copy_args(argc, verus_chips_cli, "getidentity", params, "-1");
