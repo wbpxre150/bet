@@ -47,3 +47,4 @@ release/
 external/arm64-apple-darwin*
 dist/*
 bet_version.h
+CLAUDE.md

@@ -6,11 +6,11 @@ So the question comes like do we need to use unique revoke/recovery authorities 
 
 We like to have more inputs on this to figure it out what could be the efficient way. 
 
-For now we see how a revoke/recovery authority is created and use them in registering the other IDs. The following commands are executed on the `chips10sec` test chain.
+For now we see how a revoke/recovery authority is created and use them in registering the other IDs. The following commands are executed on the `3chips150` test chain.
 
 #### Registering the revoke_2 ID
 ```
-#verus -chain=chips10sec registernamecommitment revoke_2 RV84ZKrfNiTXXCJG7HouWyFMa229WSSKoE "" "poker.chips10sec"
+#verus -chain=3chips150 registernamecommitment revoke_2 RV84ZKrfNiTXXCJG7HouWyFMa229WSSKoE "" "poker.3chips150"
 {
   "txid": "e8728b60f2b8ec617173aa7f34e322de24140c54122d1f9abfc00cbd33a41e2b",
   "namereservation": {
@@ -23,7 +23,7 @@ For now we see how a revoke/recovery authority is created and use them in regist
   }
 }
 
-#verus -chain=chips10sec registeridentity '{
+#verus -chain=3chips150 registeridentity '{
   "txid": "e8728b60f2b8ec617173aa7f34e322de24140c54122d1f9abfc00cbd33a41e2b",
   "namereservation": {
     "version": 1,
@@ -34,7 +34,7 @@ For now we see how a revoke/recovery authority is created and use them in regist
     "nameid": "iSCt7uQBePbTSJUSPAuQqv3Qjw1YZmj6FX"
   }, 
     "identity":{
-        "name":"revoke_2.poker.chips10sec", 
+        "name":"revoke_2.poker.3chips150", 
         "primaryaddresses":["RV84ZKrfNiTXXCJG7HouWyFMa229WSSKoE"], 
 	    "minimumsignatures":1, 
         "privateaddress": ""
@@ -46,7 +46,7 @@ a393edc16f433046dad20dd3e7ef82d85db86d41fc257d49ecf411a6d3dce36a
 #### Registering the recovery_2 ID
 
 ```
-#verus -chain=chips10sec registernamecommitment recovery_2 RVvsdGFt1rgqRTqCdtRqNgy2JUFWNyfCcs "" "poker.chips10sec"
+#verus -chain=3chips150 registernamecommitment recovery_2 RVvsdGFt1rgqRTqCdtRqNgy2JUFWNyfCcs "" "poker.3chips150"
 {
   "txid": "c6b0a55343f6fa5c88f6f2e248f989478c44355dae9bc9a47fa40bcff7352fe8",
   "namereservation": {
@@ -59,7 +59,7 @@ a393edc16f433046dad20dd3e7ef82d85db86d41fc257d49ecf411a6d3dce36a
   }
 }
 
-#verus -chain=chips10sec registeridentity '{
+#verus -chain=3chips150 registeridentity '{
   "txid": "c6b0a55343f6fa5c88f6f2e248f989478c44355dae9bc9a47fa40bcff7352fe8",
   "namereservation": {
     "version": 1,
@@ -70,7 +70,7 @@ a393edc16f433046dad20dd3e7ef82d85db86d41fc257d49ecf411a6d3dce36a
     "nameid": "iGXhgDHN7GBmbPPXcvNoj4Lc99pQEoA8Fj"
   }, 
     "identity":{
-        "name":"recovery_2.poker.chips10sec", 
+        "name":"recovery_2.poker.3chips150", 
         "primaryaddresses":["RVvsdGFt1rgqRTqCdtRqNgy2JUFWNyfCcs"], 
 	    "minimumsignatures":1, 
         "privateaddress": ""
@@ -81,7 +81,7 @@ a393edc16f433046dad20dd3e7ef82d85db86d41fc257d49ecf411a6d3dce36a
 #### Registering test_6 ID using revoke_2 and recovery_2 as revoke and recovery authorities
 
 ```
-#verus -chain=chips10sec registernamecommitment test_6 RFtKjKRisud8dGvbuJxbrtS1NZDKT5FLQu "" "poker.chips10sec"
+#verus -chain=3chips150 registernamecommitment test_6 RFtKjKRisud8dGvbuJxbrtS1NZDKT5FLQu "" "poker.3chips150"
 {
   "txid": "b9b9df30c178068b59a4f5904cbe4dd27e70fecbe177e257b063c5aabfd311d8",
   "namereservation": {
@@ -94,7 +94,7 @@ a393edc16f433046dad20dd3e7ef82d85db86d41fc257d49ecf411a6d3dce36a
   }
 }
 
-#verus -chain=chips10sec registeridentity '{
+#verus -chain=3chips150 registeridentity '{
   "txid": "b9b9df30c178068b59a4f5904cbe4dd27e70fecbe177e257b063c5aabfd311d8",
   "namereservation": {
     "version": 1,

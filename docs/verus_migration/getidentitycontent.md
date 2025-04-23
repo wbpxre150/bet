@@ -7,7 +7,7 @@ Initially, for incremental updates of the same key, we read the existing info fr
 Here is an example of what we are looking to achieve. Let's say I have the table ID `sg777_t`, and using four keys, I am storing the data as shown below. The key names used in this example are `player_info`, `cashier_id`, `player_1`, and `player_2`. All these keys are updated by different entities either at the same time or at different times. If I use `getidentity`, I can only retrieve the last updated key value. However, what I'm looking for is to get the last updated value of all these keys or for any specific key.
 
 ```json
-verus -chain=chips10sec updateidentity '{"name": "sg777_t", "parent":"i6gViGxt7YinkJZoubKdbWBrqdRCb1Rkvs", "contentmultimap":{
+verus -chain=3chips150 updateidentity '{"name": "sg777_t", "parent":"i6gViGxt7YinkJZoubKdbWBrqdRCb1Rkvs", "contentmultimap":{
   "player_info": [
     {
       "num_players": 2,

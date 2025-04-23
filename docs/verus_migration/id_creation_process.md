@@ -6,7 +6,7 @@ There are two types of IDs:
 1. Permanent IDs, which are created once and used for a lifetime.
 2. Temporary IDs, which are created for specific games and serve no purpose after the game ends, remaining only as archives.
 
-Based on our understanding of the ecosystem and data organization, we define and create IDs at the launch of specific game types and tokens. For poker, the following sub-IDs are initially created under `poker.chips10sec@` and will be updated as development progresses:
+Based on our understanding of the ecosystem and data organization, we define and create IDs at the launch of specific game types and tokens. For poker, the following sub-IDs are initially created under `poker.3chips150@` and will be updated as development progresses:
 1. cashiers
 2. dealers
 
@@ -20,13 +20,13 @@ To create these IDs, a control address is required. Upon mainnet launch, we need
 
 ### Contents and Updates of Cashiers ID
 
-The primary addresses of the cashiers ID contain the addresses of cashier nodes. The `cashiers.poker.chips10sec@` is a multisig address that holds funds during the game and handles settlements and disputes by validating the game. The `minimumsignatures` value is atleast `(n/2)+1`, where `n` is the number of cashier nodes. On Verus, the default transaction expiration time is 20 blocks (approximately 200 seconds for chips), which we believe is sufficient for completing multisig transactions.
+The primary addresses of the cashiers ID contain the addresses of cashier nodes. The `cashiers.poker.3chips150@` is a multisig address that holds funds during the game and handles settlements and disputes by validating the game. The `minimumsignatures` value is atleast `(n/2)+1`, where `n` is the number of cashier nodes. On Verus, the default transaction expiration time is 20 blocks (approximately 200 seconds for chips), which we believe is sufficient for completing multisig transactions.
 
 To become a cashier node, a request must be submitted to the community owners, who can approve or deny the request. The request should include the address owned by the entity making the request. If approved, the address is added to the list of primary addresses of cashiers ID.
 
 Example of a cashiers ID with four nodes and a minimum of three signatures required:
 ```
-# verus -chain=chips10sec getidentity cashiers.poker.chips10sec@
+# verus -chain=3chips150 getidentity cashiers.poker.3chips150@
 {
   "identity": {
     "version": 3,
@@ -63,7 +63,7 @@ Example of a cashiers ID with four nodes and a minimum of three signatures requi
 
 Example of a dealers ID:
 ```
-# verus -chain=chips10sec getidentity dealers.poker.chips10sec@
+# verus -chain=3chips150 getidentity dealers.poker.3chips150@
 {
   "identity": {
     "version": 3,
@@ -91,13 +91,13 @@ Example of a dealers ID:
 }
 ```
 
-The `dealers.poker.chips10sec@` sub-ID holds information about registered dealers in the poker ecosystem. Currently, only dealer ID names are stored as a string array. In the future, more statistics about dealers, such as availability and number of tables hosted, will be stored and updated by cashiers or authorized entities.
+The `dealers.poker.3chips150@` sub-ID holds information about registered dealers in the poker ecosystem. Currently, only dealer ID names are stored as a string array. In the future, more statistics about dealers, such as availability and number of tables hosted, will be stored and updated by cashiers or authorized entities.
 
 To become a dealer, a request must be submitted, and a fee may be charged for registration. Dealer ID names should end with `_d` for readability and to avoid conflicts. The `contentmultimap` of dealers stores dealer names as an array of strings, mapped to the key `chips.vrsc::poker.dealers`.
 
 Example of updating dealer names:
 ```
-verus -chain=chips10sec updateidentity '{"name": "dealers", "parent":"i6gViGxt7YinkJZoubKdbWBrqdRCb1Rkvs", "contentmultimap":{
+verus -chain=3chips150 updateidentity '{"name": "dealers", "parent":"i6gViGxt7YinkJZoubKdbWBrqdRCb1Rkvs", "contentmultimap":{
       "iSgEvATbNF3ZR6Kyj6nn8zVp3adPQxPnFJ": [
         {
           "iK7a5JNJnbeuYWVHCDRpJosj3irGJ5Qa8c": "sg777_d"
@@ -112,7 +112,7 @@ verus -chain=chips10sec updateidentity '{"name": "dealers", "parent":"i6gViGxt7Y
 
 After updating, the dealer names in the `contentmultimap` of dealers look as follows:
 ```
-# verus -chain=chips10sec getidentity dealers.poker.chips10sec@
+# verus -chain=3chips150 getidentity dealers.poker.3chips150@
 {
   "identity": {
     "version": 3,
@@ -151,7 +151,7 @@ After updating, the dealer names in the `contentmultimap` of dealers look as fol
 
 After optimization, the `contentmultimap` contains only the byte array, and the bet system has the underlying logic to decode and encode data into a byte array.
 
-If all preconditions (yet to be defined) are met for a dealer request, a sub-ID under `poker.chips10sec@` is created with the name and control address provided in the dealer request. Only the dealer can update this ID, maintaining information about its status, hosted tables, dealer fee, etc. This template of dealer information is mapped to the key `chips.vrsc::poker.dealer`.
+If all preconditions (yet to be defined) are met for a dealer request, a sub-ID under `poker.3chips150@` is created with the name and control address provided in the dealer request. Only the dealer can update this ID, maintaining information about its status, hosted tables, dealer fee, etc. This template of dealer information is mapped to the key `chips.vrsc::poker.dealer`.
 
 ## Dealer Registration Process
 
@@ -159,7 +159,7 @@ Upon a dealer's registration request, the Registration Authority (RA) verifies t
 
 A sample dealer ID is shown below. It resembles a standard ID but includes keys in the `contentmultimap` to store dealer-specific information.
 ```
-# verus -chain=chips10sec getidentity sg777_d.poker.chips10sec@
+# verus -chain=3chips150 getidentity sg777_d.poker.3chips150@
 {
   "identity": {
     "version": 3,
@@ -230,7 +230,7 @@ struct float_num {
 
 The struct data is converted to hex and stored in the dealer ID. After storing the information, the dealer ID `sg777_d` looks as follows:
 ```
-# verus -chain=chips10sec getidentity sg777_d.poker.chips10sec@
+# verus -chain=3chips150 getidentity sg777_d.poker.3chips150@
 {
   "identity": {
     "version": 3,

@@ -15,13 +15,13 @@ Anyone can create any number of IDs, but to register an ID as either a dealer or
 
 ## Key-Value Pair
 
-Information under IDs is stored in key-value pairs. We encapsulate the structure or JSON object info and map them to keys. For example, the identifier `cashiers` under `poker.chips10sec@` defines a key named `chips.vrsc::poker.cashiers` to store all information related to cashiers. 
+Information under IDs is stored in key-value pairs. We encapsulate the structure or JSON object info and map them to keys. For example, the identifier `cashiers` under `poker.3chips150@` defines a key named `chips.vrsc::poker.cashiers` to store all information related to cashiers. 
 
 Keys are defined with the prefix `chips.vrsc::` in the entire CHIPS ecosystem. For game-specific keys, we add the game type as a suffix, e.g., `chips.vrsc::poker.` for poker-related data and `chips.vrsc::bet.` for betting-related data.
 
 In the code, predefined keys are mapped to their `vdxfid` for easy lookup. For example:
 ```
-#verus -chain=chips10sec getvdxfid chips.vrsc::poker.cashiers
+#verus -chain=3chips150 getvdxfid chips.vrsc::poker.cashiers
 {
   "vdxfid": "iH6n3SW9hpou8LW4nEAzJZXDb4AG4tLnQN",
   "indexid": "xMvtWEwEZ92ZkWP6duq9Gx3kciBGyf9cB6",
@@ -102,7 +102,7 @@ Parsing commands to display dealer info:
 
 ### Dealer ID
 
-ID: `<dealer_name>.poker.chips10sec@`
+ID: `<dealer_name>.poker.3chips150@`
 
 Keys:
 ```
@@ -123,7 +123,7 @@ Example:
 
 ### Table ID
 
-ID: `<table_name>.poker.chips10sec@`
+ID: `<table_name>.poker.3chips150@`
 
 Keys:
 ```
@@ -204,14 +204,14 @@ We can actually seperate this process into two steps:
 Anyone can create any numer of ID's, but to register an ID as either dealer or cashier certain conditions to be met, we streamline this process and provide an API for it`(TO DO)`.
 
 ## Key - Value pair
-Under IDs information is stored in key-value pairs. We encapsulate the info of a structure or JSON object and map them to the keys. For example we have an identifier named `cashiers` under `poker.chips10sec@` in which we define a key named `chips.vrsc::poker.cashiers` and map all the information related to cashiers to this key and store in the cashiers ID. It's important to identity and define key to each type of data that we store in the ID, using these keys we store and retrieve the data from ID, so the type and content of data that is to be mapped to these keys should be predefined.
+Under IDs information is stored in key-value pairs. We encapsulate the info of a structure or JSON object and map them to the keys. For example we have an identifier named `cashiers` under `poker.3chips150@` in which we define a key named `chips.vrsc::poker.cashiers` and map all the information related to cashiers to this key and store in the cashiers ID. It's important to identity and define key to each type of data that we store in the ID, using these keys we store and retrieve the data from ID, so the type and content of data that is to be mapped to these keys should be predefined.
 
 We define all keys with the prefix `chips.vrsc::` in the entire CHIPS ecosystem, for the game specific keys we add game type as suffix to `chips.vrsc::` and followed by it we define keys. For example, for all the keys that maps to the data used to play poker are defined with the prefix `chips.vrsc::poker.` and likewise for all the keys that are used to to store the data related to betting are defined with the prefix `chips.vrsc::bet.` and so on...
 
 In the code for all the predefined keys, we compute their vdxfid's and map them for easy lookup. i.e, for key `chips.vrsc::poker.cashiers` the corresponding vdxfid is  
 `iH6n3SW9hpou8LW4nEAzJZXDb4AG4tLnQN` which is obtained using getvdxfid as follows: 
 ```
-#verus -chain=chips10sec getvdxfid chips.vrsc::poker.cashiers
+#verus -chain=3chips150 getvdxfid chips.vrsc::poker.cashiers
 {
   "vdxfid": "iH6n3SW9hpou8LW4nEAzJZXDb4AG4tLnQN",
   "indexid": "xMvtWEwEZ92ZkWP6duq9Gx3kciBGyf9cB6",
@@ -259,7 +259,7 @@ The keys that updates the data to this ID are
 ```
 
 ### Dealers ID
-The dealers ID under the namespace `poker.chips10sec@` is `dealers.poker.chips@` which contains the list of dealers that are registered. The dealers info is mapped to the key `chips.vrsc::poker.dealers`. Unless specified explicitly all the key types are byte vectors. 
+The dealers ID under the namespace `poker.3chips150@` is `dealers.poker.chips@` which contains the list of dealers that are registered. The dealers info is mapped to the key `chips.vrsc::poker.dealers`. Unless specified explicitly all the key types are byte vectors. 
 The list of keys that stores the information on dealers ID are:
 ```
 1. chips.vrsc::poker.dealers
@@ -292,7 +292,7 @@ Following are the parsing commands that displays dealers info of dealers ID:
 ```
 
 ### Dealer ID
-ID --> `<dealer_name>.poker.chips10sec@` //Dealer provides this name at the time of registration and all dealer names end with `_d` to avoid naming conflicts, e.g `sg777_d.poker.chips@`
+ID --> `<dealer_name>.poker.3chips150@` //Dealer provides this name at the time of registration and all dealer names end with `_d` to avoid naming conflicts, e.g `sg777_d.poker.chips@`
 The keys that updates the data to this ID are
 ```
 1. chips.vrsc::poker.t_player_info
@@ -312,7 +312,7 @@ The value mapped to this key is the table info, dealer updates this info from th
 ```
 
 ### Table ID
-ID --> `<table_name>.poker.chips10sec@` // Dealers can register upto any number of table names and all table names ends with `_t` to avoid naming conflicts, e.g `sg777_t.poker.chips@`
+ID --> `<table_name>.poker.3chips150@` // Dealers can register upto any number of table names and all table names ends with `_t` to avoid naming conflicts, e.g `sg777_t.poker.chips@`
 
 The keys that updates the data to this ID are
 ```
