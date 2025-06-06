@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include "bet.h"
 #include "vdxf.h"
 #include "commands.h"

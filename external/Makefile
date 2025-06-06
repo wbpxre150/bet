@@ -54,6 +54,7 @@ EXTERNAL_LDLIBS := -L${TARGET_DIR} $(patsubst lib%.a,-l%,$(notdir $(EXTERNAL_LIB
 submodcheck: 
 	@tools/refresh-submodules.sh $(SUBMODULES)
 	@tools/install_cmake.sh
+	@patch -p0 --forward external/libwebsockets/CMakeLists.txt < tools/libwebsockets-cmake.patch || true
 	@patch -p0 --forward external/libwebsockets/include/libwebsockets/lws-lecp.h < tools/libwebsockets.patch || true
 
 $(EXTERNAL_HEADERS): submodcheck
@@ -113,7 +114,7 @@ ${TARGET_DIR}/libnng.a: external/nng/include/nng/nng.h
 
 ${TARGET_DIR}/libwebsockets.a: external/libwebsockets/include/libwebsockets.h
 	mkdir -p $(TARGET_DIR)/libwebsockets-build
-	cd $(TARGET_DIR)/libwebsockets-build && PATH=$(shell pwd)/external/cmake/bin:${PATH} cmake -DLWS_WITH_HTTP2=1 -DLWS_WITH_NO_LOGS=ON $(TOP)/libwebsockets \
+	cd $(TARGET_DIR)/libwebsockets-build && PATH=$(shell pwd)/external/cmake/bin:${PATH} cmake -DLWS_WITH_HTTP2=1 -DLWS_WITH_NO_LOGS=ON -DDISABLE_WERROR=ON $(TOP)/libwebsockets \
 	&& $(MAKE) -j4 && cp -av lib/libwebsockets.a ..
 
 distclean: external-distclean

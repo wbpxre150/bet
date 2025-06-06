@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include "verus_rpc.h"
 #include "bet.h"
 #include "err.h"
@@ -138,9 +139,40 @@ int32_t verus_rpc_configure(const char *host, int port, const char *user,
 /* Load RPC configuration from file */
 int32_t verus_rpc_load_config(const char *config_file)
 {
-    /* This will be implemented when config.c is updated */
-    /* For now, use default configuration */
-    return verus_rpc_configure("127.0.0.1", 27486, "verusrpc", "password", "chips");
+    struct verus_rpc_ini_config config = {0};
+    int32_t retval = VERUS_RPC_OK;
+
+    if (!config_file) {
+        /* Use default blockchain config file if none provided */
+        extern char *blockchain_config_ini_file;
+        config_file = blockchain_config_ini_file;
+    }
+
+    /* Load configuration from INI file */
+    retval = bet_load_rpc_config_from_file(config_file, &config);
+    if (retval != OK) {
+        dlg_error("Failed to load RPC config from file: %s", config_file);
+        /* Use default configuration as fallback */
+        return verus_rpc_configure("127.0.0.1", 27486, "verusrpc", "password", "chips");
+    }
+
+    /* Configure RPC with loaded settings if enabled */
+    if (config.enabled) {
+        retval = verus_rpc_configure(config.host, config.port, config.user, 
+                                   config.password, config.chain);
+        if (retval != VERUS_RPC_OK) {
+            dlg_error("Failed to configure Verus RPC with loaded settings");
+        } else {
+            dlg_info("Verus RPC loaded from config: %s:%d (chain: %s)", 
+                     config.host, config.port, config.chain);
+        }
+    } else {
+        dlg_info("Verus RPC disabled in config file, using CLI fallback");
+        rpc_config.enabled = 0;
+        retval = VERUS_RPC_OK; /* Not an error if disabled */
+    }
+
+    return retval;
 }
 
 /* Core RPC call function */
