@@ -451,7 +451,7 @@ int32_t bet_parse_verus_rpc_config()
 				 rpc_ini_config.host, rpc_ini_config.port, rpc_ini_config.chain);
 		}
 	} else {
-		dlg_info("Verus RPC disabled, will use CLI fallback");
+		dlg_info("Verus RPC disabled in config");
 	}
 
 	iniparser_freedict(ini);

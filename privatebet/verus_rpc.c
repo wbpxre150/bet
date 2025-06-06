@@ -121,10 +121,11 @@ int32_t verus_rpc_configure(const char *host, int port, const char *user,
              rpc_config.host, 
              rpc_config.port);
     
-    /* Set HTTP Basic Authentication */
+    /* Set HTTP Basic Authentication using USERPWD format */
+    char userpwd[512];
+    snprintf(userpwd, sizeof(userpwd), "%s:%s", user, password);
     curl_easy_setopt(rpc_conn.curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
-    curl_easy_setopt(rpc_conn.curl, CURLOPT_USERNAME, user);
-    curl_easy_setopt(rpc_conn.curl, CURLOPT_PASSWORD, password);
+    curl_easy_setopt(rpc_conn.curl, CURLOPT_USERPWD, userpwd);
     
     /* Update headers */
     if (rpc_conn.headers) {
@@ -186,7 +187,7 @@ int32_t verus_rpc_call(const char *method, cJSON *params, cJSON **result)
     }
     
     if (!rpc_config.enabled) {
-        dlg_warn("RPC is disabled, using CLI fallback");
+        dlg_error("RPC is disabled and CLI fallback removed");
         return VERUS_RPC_ERR_CONFIG;
     }
     
@@ -208,6 +209,7 @@ int32_t verus_rpc_call(const char *method, cJSON *params, cJSON **result)
         return VERUS_RPC_ERR_JSON_PARSE;
     }
     
+    
     /* Initialize response structure */
     struct verus_rpc_response response = {0};
     
@@ -219,6 +221,12 @@ int32_t verus_rpc_call(const char *method, cJSON *params, cJSON **result)
     curl_easy_setopt(rpc_conn.curl, CURLOPT_WRITEDATA, &response);
     curl_easy_setopt(rpc_conn.curl, CURLOPT_TIMEOUT, rpc_config.timeout);
     curl_easy_setopt(rpc_conn.curl, CURLOPT_NOSIGNAL, 1L);
+    
+    /* Set authentication for this request */
+    char userpwd[512];
+    snprintf(userpwd, sizeof(userpwd), "%s:%s", rpc_config.user, rpc_config.password);
+    curl_easy_setopt(rpc_conn.curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    curl_easy_setopt(rpc_conn.curl, CURLOPT_USERPWD, userpwd);
     
     /* Perform request */
     CURLcode curl_result = curl_easy_perform(rpc_conn.curl);
@@ -235,10 +243,13 @@ int32_t verus_rpc_call(const char *method, cJSON *params, cJSON **result)
         return VERUS_RPC_ERR_CONNECTION;
     }
     
-    /* Check HTTP status */
-    if (response.http_code != 200) {
+    /* Check HTTP status - Verus RPC server returns HTTP 500 even for valid JSON-RPC responses */
+    if (response.http_code != 200 && response.http_code != 500) {
         dlg_error("RPC HTTP error: %ld", response.http_code);
-        if (response.data) free(response.data);
+        if (response.data) {
+            dlg_error("Response data: %s", response.data);
+            free(response.data);
+        }
         return VERUS_RPC_ERR_HTTP;
     }
     

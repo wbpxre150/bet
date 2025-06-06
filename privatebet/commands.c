@@ -1651,13 +1651,16 @@ int32_t make_command(int argc, char **argv, cJSON **argjson)
 			return OK;
 		}
 		
-		/* RPC failed, log and fall back to CLI */
+		/* RPC failed - no CLI fallback */
 		if (rpc_result) {
 			cJSON_Delete(rpc_result);
 		}
-		dlg_warn("RPC call failed (%s), falling back to CLI: %s", 
+		dlg_error("RPC call failed (%s): %s", 
 			 verus_rpc_get_error_message(retval), argv[1]);
+		return retval;
 	}
+	
+	/* Non-Verus commands still use CLI execution */
 	for (int32_t i = 0; i < argc; i++) {
 		cmd_size += strlen(argv[i]);
 	}

@@ -231,32 +231,8 @@ cJSON *get_cmm(char *id, int16_t full_id)
 		}
 	}
 
-	/* Fallback to CLI if RPC fails */
-	dlg_warn("RPC getidentity failed (%s), falling back to CLI", verus_rpc_get_error_message(retval));
-	
-	int argc = 4;
-	char **argv = NULL;
-
-	bet_alloc_args(argc, &argv);
-	argv = bet_copy_args(argc, verus_chips_cli, "getidentity", identity_name, "-1");
-
-	argjson = cJSON_CreateObject();
-	retval = make_command(argc, argv, &argjson);
-	if (retval != OK) {
-		dlg_info("%s", bet_err_str(retval));
-		goto end;
-	}
-
-	cJSON *identity = cJSON_GetObjectItem(argjson, "identity");
-	if (identity) {
-		cmm = cJSON_GetObjectItem(identity, "contentmultimap");
-		if (cmm) {
-			cmm = cJSON_Duplicate(cmm, 1);
-		}
-	}
-
-end:
-	bet_dealloc_args(argc, &argv);
+	/* No CLI fallback needed - RPC is working */
+	dlg_info("RPC getidentity failed: %s", verus_rpc_get_error_message(retval));
 	if (argjson) {
 		cJSON_Delete(argjson);
 	}
