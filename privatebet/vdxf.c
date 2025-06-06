@@ -6,25 +6,47 @@
 #include "game.h"
 #include "storage.h"
 #include "config.h"
+#include "verus_rpc.h"
 
 struct table player_t = { 0 };
 
 char *get_vdxf_id(char *key_name)
 {
-	int argc = 3;
-	char **argv = NULL;
-	cJSON *argjson = NULL;
+	char *vdxf_id = NULL;
+	int32_t retval;
 
 	if (!key_name)
 		return NULL;
+
+	/* Try RPC first */
+	retval = verus_rpc_getvdxfid(key_name, &vdxf_id);
+	if (retval == VERUS_RPC_OK && vdxf_id) {
+		return vdxf_id;
+	}
+
+	/* Fallback to CLI if RPC fails */
+	dlg_warn("RPC getvdxfid failed (%s), falling back to CLI", verus_rpc_get_error_message(retval));
+	
+	int argc = 3;
+	char **argv = NULL;
+	cJSON *argjson = NULL;
 
 	bet_alloc_args(argc, &argv);
 	argv = bet_copy_args(argc, verus_chips_cli, "getvdxfid", key_name);
 	argjson = cJSON_CreateObject();
 	make_command(argc, argv, &argjson);
 
+	char *result = NULL;
+	if (argjson) {
+		char *vdxfid_str = jstr(argjson, "vdxfid");
+		if (vdxfid_str) {
+			result = strdup(vdxfid_str);
+		}
+		cJSON_Delete(argjson);
+	}
+
 	bet_dealloc_args(argc, &argv);
-	return jstr(argjson, "vdxfid");
+	return result;
 }
 
 char *get_key_vdxf_id(char *key_name)
@@ -101,20 +123,31 @@ cJSON *update_with_retry(int argc, char **argv)
 cJSON *update_cmm(char *id, cJSON *cmm)
 {
 	cJSON *id_info = NULL, *argjson = NULL;
-	int argc;
-	char **argv = NULL;
-	char params[arg_size] = { 0 };
+	int32_t retval;
 
-	if ((NULL == id) || (NULL == verus_chips_cli)) {
+	if ((NULL == id) || (NULL == cmm)) {
 		return NULL;
 	}
 
 	id_info = cJSON_CreateObject();
 	cJSON_AddStringToObject(id_info, "name", id);
 	cJSON_AddStringToObject(id_info, "parent", get_vdxf_id(POKER_ID_FQN));
-	cJSON_AddItemToObject(id_info, "contentmultimap", cmm);
+	cJSON_AddItemToObject(id_info, "contentmultimap", cJSON_Duplicate(cmm, 1));
 
-	argc = 3;
+	/* Try RPC first */
+	retval = verus_rpc_updateidentity(id_info, &argjson);
+	if (retval == VERUS_RPC_OK && argjson) {
+		cJSON_Delete(id_info);
+		return argjson;
+	}
+
+	/* Fallback to CLI if RPC fails */
+	dlg_warn("RPC updateidentity failed (%s), falling back to CLI", verus_rpc_get_error_message(retval));
+	
+	int argc = 3;
+	char **argv = NULL;
+	char params[arg_size] = { 0 };
+
 	bet_alloc_args(argc, &argv);
 	snprintf(params, arg_size, "\'%s\'", cJSON_Print(id_info));
 	argv = bet_copy_args(argc, verus_chips_cli, "updateidentity", params);
@@ -122,6 +155,7 @@ cJSON *update_cmm(char *id, cJSON *cmm)
 	argjson = update_with_retry(argc, argv);
 
 	bet_dealloc_args(argc, &argv);
+	cJSON_Delete(id_info);
 	return argjson;
 }
 
@@ -166,21 +200,44 @@ end:
 
 cJSON *get_cmm(char *id, int16_t full_id)
 {
-	int32_t retval = OK, argc;
-	char **argv = NULL, params[128] = { 0 };
+	int32_t retval = OK;
 	cJSON *argjson = NULL, *cmm = NULL;
+	char identity_name[256] = {0};
 
 	if (NULL == id) {
 		return NULL;
 	}
 
-	strncpy(params, id, strlen(id));
+	/* Build identity name */
+	strncpy(identity_name, id, sizeof(identity_name) - 1);
 	if (0 == full_id) {
-		strcat(params, ".poker.chips@");
+		strncat(identity_name, ".poker.chips@", sizeof(identity_name) - strlen(identity_name) - 1);
 	}
-	argc = 4;
+
+	/* Try RPC first */
+	retval = verus_rpc_getidentity(identity_name, -1, &argjson);
+	if (retval == VERUS_RPC_OK && argjson) {
+		cJSON *identity = cJSON_GetObjectItem(argjson, "identity");
+		if (identity) {
+			cmm = cJSON_GetObjectItem(identity, "contentmultimap");
+			if (cmm) {
+				cmm = cJSON_Duplicate(cmm, 1);
+			}
+		}
+		cJSON_Delete(argjson);
+		if (cmm) {
+			return cmm;
+		}
+	}
+
+	/* Fallback to CLI if RPC fails */
+	dlg_warn("RPC getidentity failed (%s), falling back to CLI", verus_rpc_get_error_message(retval));
+	
+	int argc = 4;
+	char **argv = NULL;
+
 	bet_alloc_args(argc, &argv);
-	argv = bet_copy_args(argc, verus_chips_cli, "getidentity", params, "-1");
+	argv = bet_copy_args(argc, verus_chips_cli, "getidentity", identity_name, "-1");
 
 	argjson = cJSON_CreateObject();
 	retval = make_command(argc, argv, &argjson);
@@ -189,14 +246,19 @@ cJSON *get_cmm(char *id, int16_t full_id)
 		goto end;
 	}
 
-	cmm = cJSON_CreateObject();
-	cmm = cJSON_GetObjectItem(cJSON_GetObjectItem(argjson, "identity"), "contentmultimap");
-
-	if (cmm) {
-		cmm->next = NULL;
+	cJSON *identity = cJSON_GetObjectItem(argjson, "identity");
+	if (identity) {
+		cmm = cJSON_GetObjectItem(identity, "contentmultimap");
+		if (cmm) {
+			cmm = cJSON_Duplicate(cmm, 1);
+		}
 	}
+
 end:
 	bet_dealloc_args(argc, &argv);
+	if (argjson) {
+		cJSON_Delete(argjson);
+	}
 	return cmm;
 }
 

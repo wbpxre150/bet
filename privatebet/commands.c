@@ -25,6 +25,7 @@
 #include "commands.h"
 #include "misc.h"
 #include "err.h"
+#include "verus_rpc.h"
 
 #include <stdarg.h>
 #include <stdlib.h>
@@ -1635,6 +1636,27 @@ int32_t make_command(int argc, char **argv, cJSON **argjson)
 
 	if (argv == NULL) {
 		return ERR_ARGS_NULL;
+	}
+
+	/* Try RPC first for Verus commands */
+	if (argc >= 2 && argv[0] && strstr(argv[0], "verus") && argv[1]) {
+		cJSON *rpc_result = NULL;
+		retval = verus_rpc_call_from_args(argc, argv, &rpc_result);
+		if (retval == VERUS_RPC_OK && rpc_result) {
+			if (argjson) {
+				*argjson = rpc_result;
+			} else {
+				cJSON_Delete(rpc_result);
+			}
+			return OK;
+		}
+		
+		/* RPC failed, log and fall back to CLI */
+		if (rpc_result) {
+			cJSON_Delete(rpc_result);
+		}
+		dlg_warn("RPC call failed (%s), falling back to CLI: %s", 
+			 verus_rpc_get_error_message(retval), argv[1]);
 	}
 	for (int32_t i = 0; i < argc; i++) {
 		cmd_size += strlen(argv[i]);

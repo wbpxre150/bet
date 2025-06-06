@@ -10,6 +10,7 @@
 #include "commands.h"
 #include "vdxf.h"
 #include "dealer.h"
+#include "verus_rpc.h"
 
 char *dealer_config_ini_file = "./config/dealer_config.ini";
 char *player_config_ini_file = "./config/player_config.ini";
@@ -376,5 +377,149 @@ int32_t bet_parse_verus_player()
 		return retval;
 	}
 
+	return retval;
+}
+
+/* RPC Configuration Functions */
+int32_t bet_parse_verus_rpc_config()
+{
+	dictionary *ini = NULL;
+	struct verus_rpc_ini_config rpc_ini_config = {0};
+	int32_t retval = OK;
+
+	ini = iniparser_load(blockchain_config_ini_file);
+	if (ini == NULL) {
+		dlg_error("error in parsing %s", blockchain_config_ini_file);
+		return ERR_INI_PARSING;
+	}
+
+	/* Set default values */
+	strncpy(rpc_ini_config.host, "127.0.0.1", sizeof(rpc_ini_config.host) - 1);
+	rpc_ini_config.port = 27486;
+	strncpy(rpc_ini_config.user, "verusrpc", sizeof(rpc_ini_config.user) - 1);
+	strncpy(rpc_ini_config.chain, "chips", sizeof(rpc_ini_config.chain) - 1);
+	rpc_ini_config.timeout = 30;
+	rpc_ini_config.use_ssl = 0;
+	rpc_ini_config.enabled = 1;
+
+	/* Parse RPC settings */
+	if (NULL != iniparser_getstring(ini, "verus_rpc:host", NULL)) {
+		strncpy(rpc_ini_config.host, iniparser_getstring(ini, "verus_rpc:host", "127.0.0.1"),
+			sizeof(rpc_ini_config.host) - 1);
+	}
+	
+	if (0 != iniparser_getint(ini, "verus_rpc:port", 0)) {
+		rpc_ini_config.port = iniparser_getint(ini, "verus_rpc:port", 27486);
+	}
+	
+	if (NULL != iniparser_getstring(ini, "verus_rpc:user", NULL)) {
+		strncpy(rpc_ini_config.user, iniparser_getstring(ini, "verus_rpc:user", "verusrpc"),
+			sizeof(rpc_ini_config.user) - 1);
+	}
+	
+	if (NULL != iniparser_getstring(ini, "verus_rpc:password", NULL)) {
+		strncpy(rpc_ini_config.password, iniparser_getstring(ini, "verus_rpc:password", ""),
+			sizeof(rpc_ini_config.password) - 1);
+	}
+	
+	if (NULL != iniparser_getstring(ini, "verus_rpc:chain", NULL)) {
+		strncpy(rpc_ini_config.chain, iniparser_getstring(ini, "verus_rpc:chain", "chips"),
+			sizeof(rpc_ini_config.chain) - 1);
+	}
+	
+	if (0 != iniparser_getint(ini, "verus_rpc:timeout", 0)) {
+		rpc_ini_config.timeout = iniparser_getint(ini, "verus_rpc:timeout", 30);
+	}
+	
+	if (-1 != iniparser_getboolean(ini, "verus_rpc:use_ssl", -1)) {
+		rpc_ini_config.use_ssl = iniparser_getboolean(ini, "verus_rpc:use_ssl", 0);
+	}
+	
+	if (-1 != iniparser_getboolean(ini, "verus_rpc:enabled", -1)) {
+		rpc_ini_config.enabled = iniparser_getboolean(ini, "verus_rpc:enabled", 1);
+	}
+
+	/* Initialize RPC with loaded configuration */
+	if (rpc_ini_config.enabled) {
+		retval = verus_rpc_configure(rpc_ini_config.host, rpc_ini_config.port, 
+					     rpc_ini_config.user, rpc_ini_config.password, 
+					     rpc_ini_config.chain);
+		if (retval != OK) {
+			dlg_error("Failed to configure Verus RPC");
+		} else {
+			dlg_info("Verus RPC configured: %s:%d (chain: %s)", 
+				 rpc_ini_config.host, rpc_ini_config.port, rpc_ini_config.chain);
+		}
+	} else {
+		dlg_info("Verus RPC disabled, will use CLI fallback");
+	}
+
+	iniparser_freedict(ini);
+	return retval;
+}
+
+int32_t bet_load_rpc_config_from_file(const char *config_file, struct verus_rpc_ini_config *config)
+{
+	dictionary *ini = NULL;
+	int32_t retval = OK;
+
+	if (!config_file || !config) {
+		return ERR_INVALID_ARGS;
+	}
+
+	ini = iniparser_load(config_file);
+	if (ini == NULL) {
+		dlg_error("error in parsing %s", config_file);
+		return ERR_INI_PARSING;
+	}
+
+	/* Set default values */
+	strncpy(config->host, "127.0.0.1", sizeof(config->host) - 1);
+	config->port = 27486;
+	strncpy(config->user, "verusrpc", sizeof(config->user) - 1);
+	strncpy(config->chain, "chips", sizeof(config->chain) - 1);
+	config->timeout = 30;
+	config->use_ssl = 0;
+	config->enabled = 1;
+	memset(config->password, 0, sizeof(config->password));
+
+	/* Parse configuration */
+	if (NULL != iniparser_getstring(ini, "verus_rpc:host", NULL)) {
+		strncpy(config->host, iniparser_getstring(ini, "verus_rpc:host", "127.0.0.1"),
+			sizeof(config->host) - 1);
+	}
+	
+	if (0 != iniparser_getint(ini, "verus_rpc:port", 0)) {
+		config->port = iniparser_getint(ini, "verus_rpc:port", 27486);
+	}
+	
+	if (NULL != iniparser_getstring(ini, "verus_rpc:user", NULL)) {
+		strncpy(config->user, iniparser_getstring(ini, "verus_rpc:user", "verusrpc"),
+			sizeof(config->user) - 1);
+	}
+	
+	if (NULL != iniparser_getstring(ini, "verus_rpc:password", NULL)) {
+		strncpy(config->password, iniparser_getstring(ini, "verus_rpc:password", ""),
+			sizeof(config->password) - 1);
+	}
+	
+	if (NULL != iniparser_getstring(ini, "verus_rpc:chain", NULL)) {
+		strncpy(config->chain, iniparser_getstring(ini, "verus_rpc:chain", "chips"),
+			sizeof(config->chain) - 1);
+	}
+	
+	if (0 != iniparser_getint(ini, "verus_rpc:timeout", 0)) {
+		config->timeout = iniparser_getint(ini, "verus_rpc:timeout", 30);
+	}
+	
+	if (-1 != iniparser_getboolean(ini, "verus_rpc:use_ssl", -1)) {
+		config->use_ssl = iniparser_getboolean(ini, "verus_rpc:use_ssl", 0);
+	}
+	
+	if (-1 != iniparser_getboolean(ini, "verus_rpc:enabled", -1)) {
+		config->enabled = iniparser_getboolean(ini, "verus_rpc:enabled", 1);
+	}
+
+	iniparser_freedict(ini);
 	return retval;
 }
