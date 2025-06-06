@@ -65,11 +65,14 @@ int32_t verus_rpc_init(void)
     rpc_config.enabled = 1;
     
     /* Set up headers */
-    rpc_conn.headers = curl_slist_append(rpc_conn.headers, "Content-Type: application/json");
+    rpc_conn.headers = curl_slist_append(rpc_conn.headers, "Content-Type: text/plain");
     rpc_conn.headers = curl_slist_append(rpc_conn.headers, "Accept: application/json");
     
     rpc_conn.initialized = 1;
     dlg_info("Verus RPC client initialized successfully");
+    
+    /* Load configuration from file */
+    verus_rpc_load_config(NULL);
     
     return VERUS_RPC_OK;
 }
@@ -118,19 +121,17 @@ int32_t verus_rpc_configure(const char *host, int port, const char *user,
              rpc_config.host, 
              rpc_config.port);
     
-    /* Build auth header */
-    char auth_string[512];
-    snprintf(auth_string, sizeof(auth_string), "%s:%s", user, password);
-    snprintf(rpc_conn.auth_header, sizeof(rpc_conn.auth_header), 
-             "Authorization: Basic %s", auth_string);
+    /* Set HTTP Basic Authentication */
+    curl_easy_setopt(rpc_conn.curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+    curl_easy_setopt(rpc_conn.curl, CURLOPT_USERNAME, user);
+    curl_easy_setopt(rpc_conn.curl, CURLOPT_PASSWORD, password);
     
-    /* Update headers with auth */
+    /* Update headers */
     if (rpc_conn.headers) {
         curl_slist_free_all(rpc_conn.headers);
     }
-    rpc_conn.headers = curl_slist_append(NULL, "Content-Type: application/json");
+    rpc_conn.headers = curl_slist_append(NULL, "Content-Type: text/plain");
     rpc_conn.headers = curl_slist_append(rpc_conn.headers, "Accept: application/json");
-    rpc_conn.headers = curl_slist_append(rpc_conn.headers, rpc_conn.auth_header);
     
     dlg_info("RPC configured for %s:%d with chain=%s", host, port, chain);
     return VERUS_RPC_OK;
@@ -191,7 +192,7 @@ int32_t verus_rpc_call(const char *method, cJSON *params, cJSON **result)
     
     /* Build JSON-RPC request */
     cJSON *request = cJSON_CreateObject();
-    cJSON_AddStringToObject(request, "jsonrpc", "2.0");
+    cJSON_AddStringToObject(request, "jsonrpc", "1.0");
     cJSON_AddStringToObject(request, "method", method);
     cJSON_AddNumberToObject(request, "id", rpc_id_counter++);
     
