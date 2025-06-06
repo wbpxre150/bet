@@ -166,7 +166,7 @@ int32_t verus_rpc_call(const char *method, cJSON *params, cJSON **result)
     if (params) {
         cJSON_AddItemToObject(request, "params", cJSON_Duplicate(params, 1));
     } else {
-        cJSON_AddArrayToObject(request, "params");
+        cJSON_AddItemToObject(request, "params", cJSON_CreateArray());
     }
     
     char *request_string = cJSON_Print(request);
@@ -224,9 +224,9 @@ int32_t verus_rpc_call(const char *method, cJSON *params, cJSON **result)
     
     /* Check for JSON-RPC error */
     cJSON *error = cJSON_GetObjectItem(json_response, "error");
-    if (error && !cJSON_IsNull(error)) {
+    if (error && !is_cJSON_Null(error)) {
         cJSON *error_message = cJSON_GetObjectItem(error, "message");
-        if (error_message && cJSON_IsString(error_message)) {
+        if (error_message && is_cJSON_String(error_message)) {
             dlg_error("RPC error: %s", error_message->valuestring);
         }
         free(response.data);
@@ -260,7 +260,7 @@ int32_t verus_rpc_call_raw(const char *json_request, cJSON **result)
     cJSON *method = cJSON_GetObjectItem(request, "method");
     cJSON *params = cJSON_GetObjectItem(request, "params");
     
-    if (!method || !cJSON_IsString(method)) {
+    if (!method || !is_cJSON_String(method)) {
         cJSON_Delete(request);
         return VERUS_RPC_ERR_INVALID_PARAMS;
     }
@@ -285,7 +285,7 @@ int32_t verus_rpc_getvdxfid(const char *key_name, char **vdxf_id)
     
     if (ret == VERUS_RPC_OK && result) {
         cJSON *vdxfid_item = cJSON_GetObjectItem(result, "vdxfid");
-        if (vdxfid_item && cJSON_IsString(vdxfid_item)) {
+        if (vdxfid_item && is_cJSON_String(vdxfid_item)) {
             *vdxf_id = strdup(vdxfid_item->valuestring);
         } else {
             ret = VERUS_RPC_ERR_JSON_PARSE;
@@ -406,8 +406,8 @@ int32_t verus_rpc_getblockcount(int32_t *block_count)
     cJSON *result = NULL;
     int32_t ret = verus_rpc_call("getblockcount", NULL, &result);
     
-    if (ret == VERUS_RPC_OK && result && cJSON_IsNumber(result)) {
-        *block_count = (int32_t)cJSON_GetNumberValue(result);
+    if (ret == VERUS_RPC_OK && result && is_cJSON_Number(result)) {
+        *block_count = (int32_t)result->valuedouble;
         cJSON_Delete(result);
     } else {
         ret = VERUS_RPC_ERR_JSON_PARSE;
@@ -428,8 +428,8 @@ int32_t verus_rpc_getbalance(const char *address, double *balance)
     cJSON *result = NULL;
     int32_t ret = verus_rpc_call("getbalance", params, &result);
     
-    if (ret == VERUS_RPC_OK && result && cJSON_IsNumber(result)) {
-        *balance = cJSON_GetNumberValue(result);
+    if (ret == VERUS_RPC_OK && result && is_cJSON_Number(result)) {
+        *balance = result->valuedouble;
         cJSON_Delete(result);
     } else {
         ret = VERUS_RPC_ERR_JSON_PARSE;

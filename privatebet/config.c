@@ -464,7 +464,7 @@ int32_t bet_load_rpc_config_from_file(const char *config_file, struct verus_rpc_
 	int32_t retval = OK;
 
 	if (!config_file || !config) {
-		return ERR_INVALID_ARGS;
+		return ERR_ARGS_NULL;
 	}
 
 	ini = iniparser_load(config_file);
