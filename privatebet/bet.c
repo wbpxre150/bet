@@ -57,6 +57,15 @@ int64_t sc_start_block = 9693174;
 struct privatebet_info *bet_player = NULL;
 struct privatebet_vars *player_vars = NULL;
 
+// Global variables defined here (declared as extern in headers)
+int32_t num_of_players;
+char player_ids[CARDS777_MAXPLAYERS][MAX_ID_LEN];
+int32_t is_table_private;
+char table_password[128];
+char player_name[128];
+char verus_pid[128];
+int32_t bet_ln_config;
+
 uint8_t sharenrs[256];
 bits256 deckid;
 bits256 playershares[CARDS777_MAXCARDS][CARDS777_MAXPLAYERS];

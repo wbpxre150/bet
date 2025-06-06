@@ -45,7 +45,7 @@
 
 #include "common.h"
 #include "vdxf.h"
-enum action_type { small_blind = 1, big_blind, check, raise, call, allin, fold };
+enum action_type { small_blind = 1, big_blind, check, poker_raise, call, allin, fold };
 
 enum card_type { burn_card = 0, hole_card, flop_card_1, flop_card_2, flop_card_3, turn_card, river_card };
 
@@ -61,8 +61,8 @@ enum bet_node { player = 0, dealer, cashier };
 
 extern int32_t bet_node_type;
 
-int32_t num_of_players;
-char player_ids[CARDS777_MAXPLAYERS][MAX_ID_LEN];
+extern int32_t num_of_players;
+extern char player_ids[CARDS777_MAXPLAYERS][MAX_ID_LEN];
 
 struct BET_shardsinfo {
 	UT_hash_handle hh;

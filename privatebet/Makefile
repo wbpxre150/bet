@@ -58,7 +58,7 @@ $(info $$CC is [${CC}])
 
 $(PROJNAME): $(OBJFILES)
 #$(shell echo "#define BET_VERSION \"${BET_VERSION}\"" > bet_version.h)
-	        $(CC) $(CFLAGS) -o $@ bet.c $^ ../external/iniparser/libiniparser.a ../crypto777/libcrypto777.a -L$(TARGET_DIR) -I$(LIBWEBSOCKETS_HEADERS) -I$(LIBJSMN_HEADERS) -I$(LIBINIPARSER_HEADERS) -L$(LIBWEBSOCKETS_LDFLAGS) $(LDFLAGS) $(CPPFLAGS) -lcurl -ldl -lnng -lpthread -lm -ljsmn -lwebsockets -ldlg -L/usr/local/lib -lm -lgmp -lsqlite3 -L/usr/local/lib -lssl -lcrypto -levent -lpthread -lstdc++
+	        $(CC) $(CFLAGS) -o $@ bet.c $^ ../external/iniparser/libiniparser.a ../crypto777/libcrypto777.a -L$(TARGET_DIR) -I$(LIBWEBSOCKETS_HEADERS) -I$(LIBJSMN_HEADERS) -I$(LIBINIPARSER_HEADERS) -L$(LIBWEBSOCKETS_LDFLAGS) $(LDFLAGS) $(CPPFLAGS) -lcurl -ldl -lnng -lpthread -lm -ljsmn -lwebsockets -ldlg -L/usr/local/lib -lm -lgmp -lsqlite3 -L/usr/local/lib -lssl -lcrypto -levent -lpthread -lstdc++ -lcap
 	cp $(PROJNAME) $(CASHIER)
 %.o: %.c
 	$(CC) $(CFLAGS) -L$(TARGET_DIR) -I$(LIBINIPARSER_HEADERS) -I$(LIBWEBSOCKETS_HEADERS) -I$(LIBJSMN_HEADERS) -L$(LIBINIPARSER_LDFLAGS) -L$(LIBWEBSOCKETS_LDFLAGS) $(LDFLAGS) $(CPPFLAGS) -c $< -o $@  -I ../includes/curl

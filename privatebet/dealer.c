@@ -23,9 +23,6 @@ char all_game_keys[all_game_keys_no][128] = { T_GAME_INFO_KEY };
 
 char all_game_key_names[all_game_keys_no][128] = { "t_game_info" };
 
-int32_t num_of_players;
-char player_ids[CARDS777_MAXPLAYERS][MAX_ID_LEN];
-
 int32_t add_dealer(char *dealer_id)
 {
 	int32_t retval = OK;

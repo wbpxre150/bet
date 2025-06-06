@@ -22,7 +22,7 @@
 #include "table.h"
 #include "err.h"
 
-char action_str[8][100] = { "", "small_blind", "big_blind", "check", "raise", "call", "allin", "fold" };
+char action_str[8][100] = { "", "small_blind", "big_blind", "check", "poker_raise", "call", "allin", "fold" };
 
 /***************************************************************
 Here contains the functions which are specific to DCV
@@ -113,7 +113,7 @@ int32_t bet_dcv_next_turn(cJSON *argjson, struct privatebet_info *bet, struct pr
 				   (vars->bet_actions[i][vars->round] == big_blind) ||
 				   (((vars->bet_actions[i][vars->round] == check) ||
 				     (vars->bet_actions[i][vars->round] == call) ||
-				     (vars->bet_actions[i][vars->round] == raise)) &&
+				     (vars->bet_actions[i][vars->round] == poker_raise)) &&
 				    (maxamount != vars->betamount[i][vars->round]))) {
 				*next_turn = i;
 				return retval;
@@ -234,8 +234,8 @@ int32_t bet_dcv_round_betting(cJSON *argjson, struct privatebet_info *bet, struc
 
 		} else {
 			int allin_flag = 1;
-			for (int i = raise; i <= fold; i++) {
-				if (i == raise) {
+			for (int i = poker_raise; i <= fold; i++) {
+				if (i == poker_raise) {
 					for (int j = 0; j < bet->maxplayers; j++) {
 						if ((j != vars->turni) && (vars->funds[j] != 0)) {
 							cJSON_AddItemToArray(possibilities, cJSON_CreateNumber(i));
@@ -310,8 +310,8 @@ int32_t bet_dcv_round_betting_response(cJSON *argjson, struct privatebet_info *b
 			vars->bet_actions[playerid][round] = check;
 		} else if (strcmp(action, "call") == 0) {
 			vars->bet_actions[playerid][round] = call;
-		} else if (strcmp(action, "raise") == 0) {
-			vars->bet_actions[playerid][round] = raise;
+		} else if (strcmp(action, "poker_raise") == 0) {
+			vars->bet_actions[playerid][round] = poker_raise;
 			vars->last_raise = bet_amount - min_amount;
 		} else if (strcmp(action, "allin") == 0) {
 			vars->bet_actions[playerid][round] = allin;
@@ -466,7 +466,7 @@ int32_t bet_player_betting_statemachine(cJSON *argjson, struct privatebet_info *
 			}
 			player_lws_write(argjson);
 		} else if ((strcmp(action, "check") == 0) || (strcmp(action, "call") == 0) ||
-			   (strcmp(action, "raise") == 0) || (strcmp(action, "fold") == 0) ||
+			   (strcmp(action, "poker_raise") == 0) || (strcmp(action, "fold") == 0) ||
 			   (strcmp(action, "allin") == 0)) {
 			if (bet->myplayerid == -2) {
 				retval = (nn_send(bet->pubsock, cJSON_Print(argjson), strlen(cJSON_Print(argjson)), 0) <
@@ -503,7 +503,7 @@ int32_t bet_display_current_state(cJSON *argjson, struct privatebet_info *bet, s
 				dlg_info("big blind ");
 			} else if (vars->bet_actions[i][j] == check) {
 				dlg_info("raise ");
-			} else if (vars->bet_actions[i][j] == raise) {
+			} else if (vars->bet_actions[i][j] == poker_raise) {
 				dlg_info("check ");
 			} else if (vars->bet_actions[i][j] == call) {
 				dlg_info("call ");
@@ -676,7 +676,7 @@ int32_t bet_player_round_betting(cJSON *argjson, struct privatebet_info *bet, st
 
 	cJSON_AddStringToObject(action_response, "action", action_str[jinti(possibilities, (option - 1))]);
 
-	if (jinti(possibilities, (option - 1)) == raise) {
+	if (jinti(possibilities, (option - 1)) == poker_raise) {
 		raise_amount = jint(argjson, "bet_amount");
 		invoice_amount = raise_amount - vars->betamount[playerid][round];
 
@@ -693,7 +693,7 @@ int32_t bet_player_round_betting(cJSON *argjson, struct privatebet_info *bet, st
 		if (bet_ln_config == BET_WITH_LN) {
 			retval = bet_player_invoice_request(argjson, action_response, bet, invoice_amount);
 		} else {
-			retval = bet_player_log_bet_info(argjson, bet, invoice_amount, raise);
+			retval = bet_player_log_bet_info(argjson, bet, invoice_amount, poker_raise);
 		}
 	} else if (jinti(possibilities, (option - 1)) == call) {
 		if (min_amount > jint(argjson, "bet_amount")) {
@@ -780,8 +780,8 @@ int32_t bet_player_round_betting_response(cJSON *argjson, struct privatebet_info
 			vars->bet_actions[playerid][round] = check;
 		} else if (strcmp(action, "call") == 0) {
 			vars->bet_actions[playerid][round] = call;
-		} else if (strcmp(action, "raise") == 0) {
-			vars->bet_actions[playerid][round] = raise;
+		} else if (strcmp(action, "poker_raise") == 0) {
+			vars->bet_actions[playerid][round] = poker_raise;
 		} else if (strcmp(action, "fold") == 0) {
 			vars->bet_actions[playerid][round] = fold;
 		} else if (strcmp(action, "allin") == 0) {
