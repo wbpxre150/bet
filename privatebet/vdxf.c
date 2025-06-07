@@ -1342,7 +1342,7 @@ cJSON *list_dealers()
 	dealers = get_cJSON_from_id_key(DEALERS_ID_FQN, DEALERS_KEY, 1);
 
 	if (!dealers) {
-		dlg_info("No dealers has been added to dealers.poker.chips@ yet.");
+		dlg_info("No dealers has been added to dealers.poker.3chips150@ yet.");
 		return NULL;
 	}
 	dealers_arr = cJSON_GetObjectItem(dealers, "dealers");

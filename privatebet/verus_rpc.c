@@ -271,7 +271,19 @@ int32_t verus_rpc_call(const char *method, cJSON *params, cJSON **result)
     if (error && !is_cJSON_Null(error)) {
         cJSON *error_message = cJSON_GetObjectItem(error, "message");
         if (error_message && is_cJSON_String(error_message)) {
-            dlg_error("RPC error: %s", error_message->valuestring);
+            /* For identity-related errors, also show which identity was being looked up */
+            if (strstr(error_message->valuestring, "Identity not found") && 
+                strcmp(method, "getidentity") == 0 && params) {
+                cJSON *identity_param = cJSON_GetArrayItem(params, 0);
+                if (identity_param && is_cJSON_String(identity_param)) {
+                    dlg_error("RPC error: %s (looking for identity: %s)", 
+                             error_message->valuestring, identity_param->valuestring);
+                } else {
+                    dlg_error("RPC error: %s", error_message->valuestring);
+                }
+            } else {
+                dlg_error("RPC error: %s", error_message->valuestring);
+            }
         }
         free(response.data);
         cJSON_Delete(json_response);
